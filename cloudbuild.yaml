@@ -1,0 +1,17 @@
+steps:
+
+# Build the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/PROJECT_ID/cosign-cloudbuild', '.' ]
+
+# Push the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'gcr.io/PROJECT_ID/cosign-cloudbuild' ]
+
+# Sign the image
+- name: 'gcr.io/projectsigstore/cosign/ci/cosign@sha256:2bd48daccf06c991fb546df4d33226793b267a65a5141d0e3340ec3ea5834b4a'
+  args:
+  - sign
+  - -kms
+  - gcpkms://projects/$PROJECT_ID/locations/global/keyRings/cosign/cryptoKeys/cosign
+  - gcr.io/PROJECT_ID/cosign-cloudbuild
